@@ -1,0 +1,4 @@
+http://ai.berkeley.edu/course_schedule.html
+
+https://inst.eecs.berkeley.edu/~cs188/fa22/
+
