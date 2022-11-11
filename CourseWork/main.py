@@ -166,8 +166,8 @@ specificity = TN/(TN+FP)
 "Sensitivity: {} | Specifictity: {}".format(sensitivity, specificity)
 
 ### Predicting using Navie Bayes Classifier
-# training a Naive Bayes classifier ( Accuracy score: 94.8, Sensitivity: 97%, Specifictity: 95.5%)
-# Total = 287.3
+# training a Naive Bayes classifier (Accuracy score: 94.8, Sensitivity: 97%, Specifictity: 95.5%)
+# Total = 287.3 (Second best result)
 from sklearn.naive_bayes import GaussianNB 
 gnb = GaussianNB().fit(X_train, y_train) 
 gnb_predictions = gnb.predict(X_test) 
@@ -226,6 +226,49 @@ sns.heatmap(cf_matrix, annot=labels, fmt="", cmap='Blues')
 ac = accuracy_score(y_test, predictions)
 rs = recall_score(y_test, predictions, average=None)
 ps = precision_score(y_test, predictions, average=None)
+
+print("Accuracy score: " + str(ac*100))
+print("Recall score: " + str(rs))
+print("Precision score: " + str(ps))
+
+TP = cf_matrix[1, 1]
+TN = cf_matrix[0, 0]
+FP = cf_matrix[0, 1]
+FN = cf_matrix[1, 0]
+
+sensitivity = TP/(TP+FN)
+specificity = TN/(TN+FP)
+
+"Sensitivity: {} | Specifictity: {}".format(sensitivity, specificity)
+
+# Making use of an hybrid approach of SVM and Naive Bayes Classifier 
+
+# Creating a hybrid model SVM + Naive Bayes
+# Total = 287.3 (Second best result)
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.ensemble import VotingClassifier
+
+gnb = GaussianNB()
+svm = SVC(kernel='linear', probability=True)
+eclf = VotingClassifier(estimators=[('gnb', gnb), ('svm', svm)], voting='soft')
+
+eclf.fit(X_train, y_train)
+hybrid_predictions = eclf.predict(X_test)
+
+# creating a confusion matrix
+cf_matrix = confusion_matrix(y_test, hybrid_predictions)
+
+group_names = ["True Neg","False Pos","False Neg","True Pos"]
+group_counts = ["{0:0.0f}".format(value) for value in cf_matrix.flatten()]
+group_percentages = ["{0:.2%}".format(value) for value in cf_matrix.flatten()/np.sum(cf_matrix)]
+labels = [f"{v1}\n{v2}\n{v3}" for v1, v2, v3 in zip(group_names,group_counts,group_percentages)]
+labels = np.asarray(labels).reshape(2,2)
+sns.heatmap(cf_matrix, annot=labels, fmt="", cmap='Blues')
+
+ac = accuracy_score(y_test, hybrid_predictions)
+rs = recall_score(y_test, hybrid_predictions, average=None)
+ps = precision_score(y_test, hybrid_predictions, average=None)
 
 print("Accuracy score: " + str(ac*100))
 print("Recall score: " + str(rs))
