@@ -4,6 +4,8 @@ import seaborn as sns             # used for visualization
 import matplotlib.pyplot as plt   # used for plotting data
 
 dataset = pd.read_csv("dataset.csv")
+# Converting entire dataset into lowercase
+dataset = dataset.apply(lambda x: x.astype(str).str.lower())
 
 # change GENDER Column values into 0 = male and 1 = female
 dataset['GENDER'].replace('M', 0,inplace=True)
